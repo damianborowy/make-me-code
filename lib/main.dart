@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:make_me_code/models/languages.dart';
 import 'package:make_me_code/providers/theme_provider.dart';
+import 'package:make_me_code/providers/upgrades_provider.dart';
 import 'package:make_me_code/widgets/bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -8,7 +10,10 @@ void main() {
     providers: [
       ChangeNotifierProvider(
         create: (_) => ThemeProvider(),
-      )
+      ),
+      ChangeNotifierProvider(
+        create: (_) => UpgradesProvider(),
+      ),
     ],
     child: MyApp(),
   ));
@@ -40,6 +45,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  void foo() {
+    context.read<UpgradesProvider>().realmUpgrades.entries.forEach((element) {
+      print(element.value.languageUpgrades);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,24 +66,10 @@ class _MyHomePageState extends State<MyHomePage> {
             )),
         body: Row(
           children: [
-            Text(
-              context.watch<ThemeProvider>().themeMode.toString()),
             Container(
               child: TextButton(
-                onPressed: () {
-                  print('Set Light Theme');
-                  context.read<ThemeProvider>().setLightMode();
-                },
-                child: Text('Set Light Theme'),
-              ),
-            ),
-            Container(
-              child: TextButton(
-                onPressed: () {
-                  print('Set Dark Theme');
-                  context.read<ThemeProvider>().setDarkMode();
-                },
-                child: Text('Set Dark theme'),
+                onPressed: foo,
+                child: Text('Sus'),
               ),
             ),
           ],

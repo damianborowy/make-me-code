@@ -1,0 +1,3 @@
+enum Realm {
+  FRONTEND,
+}

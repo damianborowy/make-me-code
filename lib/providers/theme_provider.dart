@@ -9,9 +9,12 @@ class ThemeProvider with ChangeNotifier {
     StorageManager.readData('themeMode').then((value) {
       final themeMode = value ?? ThemeMode.system;
 
-      if (themeMode == 'light') _themeMode = ThemeMode.light;
-      else if (themeMode == 'dark') _themeMode = ThemeMode.dark;
-      else _themeMode = themeMode;
+      if (themeMode == 'light')
+        _themeMode = ThemeMode.light;
+      else if (themeMode == 'dark')
+        _themeMode = ThemeMode.dark;
+      else
+        _themeMode = themeMode;
 
       notifyListeners();
     });
