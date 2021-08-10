@@ -22,13 +22,13 @@ class ThemeProvider with ChangeNotifier {
 
   void setDarkMode() async {
     _themeMode = ThemeMode.dark;
-    StorageManager.saveData('themeMode', 'dark');
+    await StorageManager.saveData('themeMode', 'dark');
     notifyListeners();
   }
 
   void setLightMode() async {
     _themeMode = ThemeMode.light;
-    StorageManager.saveData('themeMode', 'light');
+    await StorageManager.saveData('themeMode', 'light');
     notifyListeners();
   }
 }

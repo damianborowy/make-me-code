@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:make_me_code/models/languages.dart';
+import 'package:make_me_code/models/language_enum.dart';
+import 'package:make_me_code/models/realm_enum.dart';
+import 'package:make_me_code/models/realm_upgrades.dart';
 import 'package:make_me_code/providers/engine_provider.dart';
 import 'package:make_me_code/providers/theme_provider.dart';
 import 'package:make_me_code/providers/upgrades_provider.dart';
@@ -49,6 +51,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  void _onPress() {
+    final json = context.read<UpgradesProvider>().realmUpgrades.toJson();
+    print(json);
+    final obj = RealmUpgrades.fromJson(json);
+    print(obj);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,7 +71,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             )),
-        body: Row(),
+        body: Column(
+          children: [
+            TextButton(onPressed: _onPress, child: Text('lala')),
+            Text(context.watch<EngineProvider>().delay.toString()),
+            Text(context.watch<EngineProvider>().selectedLanguage.name),
+            Text(context.watch<EngineProvider>().selectedRealm.name)
+          ],
+        ),
         bottomNavigationBar: MyBottomNavBar());
   }
 }

@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-@JsonSerializable()
+part 'upgrade_details.g.dart';
+
+@JsonSerializable(explicitToJson: true)
 class UpgradeDetails {
-  late Icon icon;
+  @JsonKey(ignore: true)
+  late IconData icon;
+
   late String name;
   late int level;
+
+  @JsonKey(ignore: true)
   double? upgradeCost;
+
+  @JsonKey(ignore: true)
   String? upgradePercentageProfit;
 
-  UpgradeDetails({required Icon icon, required String name, int? level}) {
-    this.icon = icon;
-    this.name = name;
-    this.level = level ?? 0;
-  }
+  UpgradeDetails({required this.name, required this.level});
+
+  factory UpgradeDetails.fromJson(Map<String, dynamic> json) =>
+      _$UpgradeDetailsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UpgradeDetailsToJson(this);
 }
