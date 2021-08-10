@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:make_me_code/models/languages.dart';
+import 'package:make_me_code/providers/engine_provider.dart';
 import 'package:make_me_code/providers/theme_provider.dart';
 import 'package:make_me_code/providers/upgrades_provider.dart';
 import 'package:make_me_code/widgets/bottom_nav_bar.dart';
@@ -13,6 +14,9 @@ void main() {
       ),
       ChangeNotifierProvider(
         create: (_) => UpgradesProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (_) => EngineProvider(),
       ),
     ],
     child: MyApp(),
@@ -45,12 +49,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  void foo() {
-    context.read<UpgradesProvider>().realmUpgrades.entries.forEach((element) {
-      print(element.value.languageUpgrades);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,16 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             )),
-        body: Row(
-          children: [
-            Container(
-              child: TextButton(
-                onPressed: foo,
-                child: Text('Sus'),
-              ),
-            ),
-          ],
-        ),
+        body: Row(),
         bottomNavigationBar: MyBottomNavBar());
   }
 }

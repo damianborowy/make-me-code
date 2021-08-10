@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:make_me_code/models/languages.dart';
+import 'package:make_me_code/models/realms.dart';
 import 'package:make_me_code/models/upgrade_details.dart';
 
 @JsonSerializable()
-class LanguageUpgrades<T> {
-  late Map<T, List<UpgradeDetails>> languageUpgrades;
+class LanguageDetails {
+  late Map<Language, List<UpgradeDetails>> upgrades;
+  late double linesOfCode;
 
-  LanguageUpgrades() {
+  LanguageDetails(Realm realm) {
     // ! TODO:: load from localStorage
 
-    if (T is FrontendLanguage) {
-      languageUpgrades = {
-        FrontendLanguage.HTML: <UpgradeDetails>[
+    if (realm == Realm.FRONTEND) {
+      upgrades = {
+        Language.HTML: <UpgradeDetails>[
           UpgradeDetails(
             icon: Icon(Icons.ac_unit),
             name: 'Some upgrade 1',
@@ -23,9 +25,10 @@ class LanguageUpgrades<T> {
             name: 'Some upgrade 2',
           ),
         ],
-      } as Map<T, List<UpgradeDetails>>;
+      };
     } else {
-      languageUpgrades = {};
+      upgrades = {};
+      linesOfCode = 0;
     }
   }
 }
