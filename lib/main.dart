@@ -72,7 +72,24 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     return Timer.periodic(new Duration(milliseconds: _delay!), (timer) {
-      print("game loop will go here");
+      final stopwatch = Stopwatch()..start();
+
+      // const newUpgrades: AllUpgrades = JSON.parse(JSON.stringify(allUpgrades));
+      // const newRealmsEconomies: AllRealmsEconomies = JSON.parse(JSON.stringify(allRealmsEconomies));
+
+      // Object.entries(allUpgrades).forEach(([realm, realmUpgrades]) => {
+      //   Object.entries(realmUpgrades).forEach(([language, upgrades]) => {
+      //     const sumOfNewLines = upgrades.reduce((acc, upgrade) => acc + (upgrade.production || 0), 0);
+
+      //     newRealmsEconomies[realm][language] += sumOfNewLines;
+      //   });
+      // });
+
+      // setAllUpgrades(newUpgrades);
+      // setAllRealmsEconomies(newRealmsEconomies);
+
+      final realmUpgrades =
+          context.read<UpgradesProvider>().realmUpgrades.realmUpgrades;
 
       final delay = context.read<EngineProvider>().delay;
 
@@ -81,6 +98,8 @@ class _MyHomePageState extends State<MyHomePage> {
         _timer?.cancel();
         _timer = _setupTimer();
       }
+
+      print('Game loop took ${stopwatch.elapsed.inMilliseconds}ms');
     });
   }
 

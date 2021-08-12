@@ -9,8 +9,6 @@ class RealmUpgrades {
   late Map<Realm, LanguageDetails> realmUpgrades;
 
   RealmUpgrades() {
-    // ! TODO:: load from localStorage
-
     realmUpgrades = _getDefaultRealmUpgrades();
   }
 
