@@ -1,24 +1,36 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:make_me_code/models/language_enum.dart';
 import 'package:make_me_code/models/realm_enum.dart';
-import 'package:make_me_code/models/realm_upgrades.dart';
 import 'package:make_me_code/providers/engine_provider.dart';
 import 'package:make_me_code/providers/theme_provider.dart';
 import 'package:make_me_code/providers/upgrades_provider.dart';
 import 'package:make_me_code/widgets/bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:path_provider/path_provider.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+
+  final upgradesProvider = await UpgradesProvider.create();
+  final themeProvider = await ThemeProvider.create();
+  final engineProvider = await EngineProvider.create();
+
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
-        create: (_) => ThemeProvider(),
+        create: (_) => themeProvider,
       ),
       ChangeNotifierProvider(
-        create: (_) => UpgradesProvider(),
+        create: (_) => upgradesProvider,
       ),
       ChangeNotifierProvider(
-        create: (_) => EngineProvider(),
+        create: (_) => engineProvider,
       ),
     ],
     child: MyApp(),
@@ -51,6 +63,39 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Timer? _timer;
+  int? _delay;
+
+  Timer _setupTimer() {
+    if (_delay == null) {
+      _delay = context.read<EngineProvider>().delay;
+    }
+
+    return Timer.periodic(new Duration(milliseconds: _delay!), (timer) {
+      print("game loop will go here");
+
+      final delay = context.read<EngineProvider>().delay;
+
+      if (delay != _delay) {
+        _delay = delay;
+        _timer?.cancel();
+        _timer = _setupTimer();
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _timer = _setupTimer();
+  }
+
+  @override
+  void didUpdateWidget(covariant MyHomePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,6 +111,12 @@ class _MyHomePageState extends State<MyHomePage> {
             )),
         body: Column(
           children: [
+            TextButton(
+              child: Text('click'),
+              onPressed: () => context
+                  .read<EngineProvider>()
+                  .setDelay(context.read<EngineProvider>().delay ~/ 2),
+            ),
             Text(context.watch<EngineProvider>().delay.toString()),
             Text(context.watch<EngineProvider>().selectedLanguage.name),
             Text(context.watch<EngineProvider>().selectedRealm.name)
