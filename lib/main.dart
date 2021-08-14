@@ -8,9 +8,10 @@ import 'package:make_me_code/models/realm_enum.dart';
 import 'package:make_me_code/providers/engine_provider.dart';
 import 'package:make_me_code/providers/theme_provider.dart';
 import 'package:make_me_code/providers/upgrades_provider.dart';
+import 'package:make_me_code/utils/number_prettifier.dart';
 import 'package:make_me_code/widgets/bottom_nav_bar.dart';
+import 'package:make_me_code/widgets/upgrades_panel.dart';
 import 'package:provider/provider.dart';
-import 'package:path_provider/path_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,7 +42,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Make me code',
+      title: 'Make me Code',
       theme: ThemeData(
         primaryColor: Colors.white,
         brightness: Brightness.light,
@@ -66,40 +67,23 @@ class _MyHomePageState extends State<MyHomePage> {
   Timer? _timer;
   int? _delay;
 
-  Timer _setupTimer() {
+  Future<Timer> _setupTimer() async {
     if (_delay == null) {
       _delay = context.read<EngineProvider>().delay;
     }
 
-    return Timer.periodic(new Duration(milliseconds: _delay!), (timer) {
-      final stopwatch = Stopwatch()..start();
+    return Timer.periodic(new Duration(milliseconds: _delay!), (timer) async {
+      if (_timer == null) _timer = timer;
 
-      // const newUpgrades: AllUpgrades = JSON.parse(JSON.stringify(allUpgrades));
-      // const newRealmsEconomies: AllRealmsEconomies = JSON.parse(JSON.stringify(allRealmsEconomies));
-
-      // Object.entries(allUpgrades).forEach(([realm, realmUpgrades]) => {
-      //   Object.entries(realmUpgrades).forEach(([language, upgrades]) => {
-      //     const sumOfNewLines = upgrades.reduce((acc, upgrade) => acc + (upgrade.production || 0), 0);
-
-      //     newRealmsEconomies[realm][language] += sumOfNewLines;
-      //   });
-      // });
-
-      // setAllUpgrades(newUpgrades);
-      // setAllRealmsEconomies(newRealmsEconomies);
-
-      final realmUpgrades =
-          context.read<UpgradesProvider>().realmUpgrades.realmUpgrades;
+      await context.read<UpgradesProvider>().calculateEarnings();
 
       final delay = context.read<EngineProvider>().delay;
 
       if (delay != _delay) {
         _delay = delay;
         _timer?.cancel();
-        _timer = _setupTimer();
+        _timer = await _setupTimer();
       }
-
-      print('Game loop took ${stopwatch.elapsed.inMilliseconds}ms');
     });
   }
 
@@ -107,12 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
-    _timer = _setupTimer();
-  }
-
-  @override
-  void didUpdateWidget(covariant MyHomePage oldWidget) {
-    super.didUpdateWidget(oldWidget);
+    _setupTimer();
   }
 
   @override
@@ -124,7 +103,17 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Center(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [Text('money'), Text('prestige'), Text('paid')],
+                  children: [
+                    Text(prettifyNumber(context
+                            .watch<UpgradesProvider>()
+                            .realmUpgrades
+                            .realmUpgrades[
+                                context.watch<EngineProvider>().selectedRealm]
+                            ?.linesOfCode ??
+                        0)),
+                    Text('money/s'),
+                    Text('prestige')
+                  ],
                 ),
               ),
             )),
@@ -136,9 +125,15 @@ class _MyHomePageState extends State<MyHomePage> {
                   .read<EngineProvider>()
                   .setDelay(context.read<EngineProvider>().delay ~/ 2),
             ),
-            Text(context.watch<EngineProvider>().delay.toString()),
-            Text(context.watch<EngineProvider>().selectedLanguage.name),
-            Text(context.watch<EngineProvider>().selectedRealm.name)
+            TextButton(
+              child: Text('reset money'),
+              onPressed: () => context
+                  .read<UpgradesProvider>()
+                  .realmUpgrades
+                  .realmUpgrades[Realm.FRONTEND]!
+                  .linesOfCode = 0,
+            ),
+            UpgradesPanel()
           ],
         ),
         bottomNavigationBar: MyBottomNavBar());

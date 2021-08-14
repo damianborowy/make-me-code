@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.app.make_me_code">
    <application
-        android:label="make_me_code"
+        android:label="Make me Code"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

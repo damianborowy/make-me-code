@@ -9,7 +9,7 @@ part of 'upgrade_details.dart';
 UpgradeDetails _$UpgradeDetailsFromJson(Map<String, dynamic> json) =>
     UpgradeDetails(
       name: json['name'] as String,
-      level: json['level'] as int,
+      level: json['level'] as double,
     );
 
 Map<String, dynamic> _$UpgradeDetailsToJson(UpgradeDetails instance) =>

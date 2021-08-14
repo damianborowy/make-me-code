@@ -13,22 +13,49 @@ class LanguageDetails {
   late double linesOfCode;
   late Realm realm;
 
-  static const upgradeIcons = {
+  static const upgradeProperties = {
     Realm.FRONTEND: {
-      Language.HTML: [Icons.ac_unit, Icons.access_alarm]
+      Language.HTML: [
+        {
+          'icon': Icons.ac_unit,
+          'baseCost': 5.0,
+          'expBase': 1.1,
+          'baseProductivity': 1.0,
+          'multipliers': {25: 8.0, 50: 8.0, 100: 8.0, 150: 4.0, 200: 2.5}
+        },
+        {
+          'icon': Icons.access_time,
+          'baseCost': 40.0,
+          'expBase': 1.13,
+          'baseProductivity': 12.0,
+          'multipliers': {25: 15.0, 50: 5.0, 100: 9.0, 150: 2.5}
+        },
+        {
+          'icon': Icons.accessible,
+          'baseCost': 720.0,
+          'expBase': 1.14,
+          'baseProductivity': 180.0,
+          'multipliers': {25: 5.0, 50: 5.0, 100: 5.0}
+        },
+        {
+          'icon': Icons.account_box,
+          'baseCost': 8640.0,
+          'expBase': 1.13,
+          'baseProductivity': 1060.0,
+          'multipliers': {25: 2.0, 50: 4.0, 100: 3.0}
+        },
+      ]
     }
   };
 
   LanguageDetails({required this.realm, required this.linesOfCode}) {
-    // ! TODO:: load from localStorage
-
     if (realm == Realm.FRONTEND) {
       upgrades = _getDefaultFrontendUpgrades();
     } else {
       upgrades = {};
     }
 
-    _applyIcons(realm);
+    _applyProperties(realm);
   }
 
   factory LanguageDetails.fromJson(Map<String, dynamic> json) =>
@@ -36,10 +63,23 @@ class LanguageDetails {
 
   Map<String, dynamic> toJson() => _$LanguageDetailsToJson(this);
 
-  void _applyIcons(Realm realm) {
+  void _applyProperties(Realm realm) {
     upgrades.entries.forEach((element) {
       upgrades[element.key] = element.value.mapIndexed((upgrade, index) {
-        upgrade.icon = upgradeIcons[realm]![element.key]![index];
+        upgrade.icon =
+            upgradeProperties[realm]![element.key]![index]['icon']! as IconData;
+        upgrade.baseCost = upgradeProperties[realm]![element.key]![index]
+            ['baseCost']! as double;
+        upgrade.expBase = upgradeProperties[realm]![element.key]![index]
+            ['expBase']! as double;
+        upgrade.baseProductivity =
+            upgradeProperties[realm]![element.key]![index]['baseProductivity']!
+                as double;
+        upgrade.multipliers = upgradeProperties[realm]![element.key]![index]
+            ['multipliers']! as Map<int, double>;
+
+        upgrade.calculateLinesOfCodePerLoop();
+
         return upgrade;
       }).toList();
     });
@@ -50,7 +90,7 @@ class LanguageDetails {
       Language.HTML: <UpgradeDetails>[
         UpgradeDetails(
           name: 'Some upgrade 1',
-          level: 0,
+          level: 1,
         ),
         UpgradeDetails(
           name: 'Some upgrade 2',
