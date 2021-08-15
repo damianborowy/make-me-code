@@ -8,6 +8,7 @@ import 'package:make_me_code/models/realm_enum.dart';
 import 'package:make_me_code/providers/engine_provider.dart';
 import 'package:make_me_code/providers/theme_provider.dart';
 import 'package:make_me_code/providers/upgrades_provider.dart';
+import 'package:make_me_code/utils/lifecycle_event_handler.dart';
 import 'package:make_me_code/utils/number_prettifier.dart';
 import 'package:make_me_code/widgets/bottom_nav_bar.dart';
 import 'package:make_me_code/widgets/upgrades_panel.dart';
@@ -75,9 +76,10 @@ class _MyHomePageState extends State<MyHomePage> {
     return Timer.periodic(new Duration(milliseconds: _delay!), (timer) async {
       if (_timer == null) _timer = timer;
 
-      await context.read<UpgradesProvider>().calculateEarnings();
-
       final delay = context.read<EngineProvider>().delay;
+
+      await context.read<UpgradesProvider>().calculateEarnings(delay);
+      await context.read<EngineProvider>().setLastIdleTime(DateTime.now());
 
       if (delay != _delay) {
         _delay = delay;
@@ -87,11 +89,37 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future<void> _calculateIdleEarnings() async {
+    if (_timer == null) _timer = await _setupTimer();
+
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Idle earnings'),
+            content: Text("While being away you've earned: "),
+            actions: <Widget>[
+              TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('Great!')),
+            ],
+          );
+        });
+  }
+
   @override
   void initState() {
     super.initState();
 
     _setupTimer();
+    _calculateIdleEarnings();
+
+    WidgetsBinding.instance!.addObserver(LifecycleEventHandler(
+        onResume: _calculateIdleEarnings,
+        onPause: () async {
+          _timer?.cancel();
+          _timer = null;
+        }));
   }
 
   @override
@@ -111,7 +139,15 @@ class _MyHomePageState extends State<MyHomePage> {
                                 context.watch<EngineProvider>().selectedRealm]
                             ?.linesOfCode ??
                         0)),
-                    Text('money/s'),
+                    Text(prettifyNumber(context
+                                .watch<UpgradesProvider>()
+                                .realmUpgrades
+                                .realmUpgrades[context
+                                    .watch<EngineProvider>()
+                                    .selectedRealm]
+                                ?.linesOfCodePerSecond ??
+                            0) +
+                        "/s"),
                     Text('prestige')
                   ],
                 ),

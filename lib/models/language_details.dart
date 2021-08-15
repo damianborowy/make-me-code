@@ -13,6 +13,9 @@ class LanguageDetails {
   late double linesOfCode;
   late Realm realm;
 
+  @JsonKey(ignore: true)
+  double? linesOfCodePerSecond;
+
   static const upgradeProperties = {
     Realm.FRONTEND: {
       Language.HTML: [

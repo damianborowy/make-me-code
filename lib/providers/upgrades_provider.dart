@@ -26,7 +26,7 @@ class UpgradesProvider with ChangeNotifier {
     return UpgradesProvider._create(realmUpgrades: storedRealmUpgrades);
   }
 
-  Future<void> calculateEarnings() async {
+  Future<void> calculateEarnings(int delay) async {
     _realmUpgrades.realmUpgrades.entries.forEach((realmUpgradeEntry) {
       var newLinesOfCode = realmUpgradeEntry.value.linesOfCode;
 
@@ -37,6 +37,9 @@ class UpgradesProvider with ChangeNotifier {
                 previousValue + (upgrade.linesOfCodePerLoop ?? 0));
       });
 
+      realmUpgradeEntry.value.linesOfCodePerSecond =
+          (newLinesOfCode - realmUpgradeEntry.value.linesOfCode) /
+              (delay / 1000);
       realmUpgradeEntry.value.linesOfCode = newLinesOfCode;
 
       realmUpgradeEntry.value.upgrades.entries.forEach((languageUpgradesEntry) {

@@ -19,13 +19,18 @@ class EngineProvider with ChangeNotifier {
   late int _delay;
   late Realm _selectedRealm;
   late Language _selectedLanguage;
+  late DateTime _lastIdleTime;
 
   int get delay => _delay;
   Realm get selectedRealm => _selectedRealm;
   Language get selectedLanguage => _selectedLanguage;
+  DateTime get lastIdleTime => _lastIdleTime;
 
   EngineProvider._create(
-      {int? delay, String? selectedRealm, String? selectedLanguage}) {
+      {int? delay,
+      String? selectedRealm,
+      String? selectedLanguage,
+      DateTime? lastIdleTime}) {
     _delay = delay ?? 1000;
 
     _selectedRealm = selectedRealm != null
@@ -36,6 +41,8 @@ class EngineProvider with ChangeNotifier {
         ? enumDecode(languageEnumMap, selectedLanguage)
         : _selectedLanguage = Language.HTML;
 
+    _lastIdleTime = lastIdleTime ?? DateTime.now();
+
     notifyListeners();
   }
 
@@ -45,14 +52,16 @@ class EngineProvider with ChangeNotifier {
     final storedDelay = await box.get('delay');
     final storedSelectedRealm = await box.get('selectedRealm');
     final storedSelectedLanguage = await box.get('selectedLanguage');
+    final storedLastIdleTime = await box.get('lastIdleTime');
 
     return EngineProvider._create(
         delay: storedDelay,
         selectedRealm: storedSelectedRealm,
-        selectedLanguage: storedSelectedLanguage);
+        selectedLanguage: storedSelectedLanguage,
+        lastIdleTime: storedLastIdleTime);
   }
 
-  void setDelay(int newDelay) async {
+  Future<void> setDelay(int newDelay) async {
     _delay = newDelay;
     notifyListeners();
 
@@ -60,7 +69,7 @@ class EngineProvider with ChangeNotifier {
     await box.put('delay', newDelay);
   }
 
-  void setSelectedRealm(Realm newSelectedRealm) async {
+  Future<void> setSelectedRealm(Realm newSelectedRealm) async {
     _selectedRealm = newSelectedRealm;
     notifyListeners();
 
@@ -68,11 +77,19 @@ class EngineProvider with ChangeNotifier {
     await box.put('selectedRealm', realmEnumMap[newSelectedRealm]);
   }
 
-  void setSelectedLanguage(Language newSelectedLanguage) async {
+  Future<void> setSelectedLanguage(Language newSelectedLanguage) async {
     _selectedLanguage = newSelectedLanguage;
     notifyListeners();
 
     final box = await Hive.openBox('engineProvider');
     await box.put('selectedLanguage', languageEnumMap[newSelectedLanguage]);
+  }
+
+  Future<void> setLastIdleTime(DateTime lastIdleTime) async {
+    _lastIdleTime = lastIdleTime;
+    notifyListeners();
+
+    final box = await Hive.openBox('engineProvider');
+    await box.put('lastIdleTime', lastIdleTime);
   }
 }
