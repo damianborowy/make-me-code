@@ -34,7 +34,7 @@ class UpgradeDetails {
   double? upgradeCost;
 
   @JsonKey(ignore: true)
-  double? maxPossibleLevel;
+  double? levelAfterLeveledUp;
 
   @JsonKey(ignore: true)
   String? upgradePercentageProfit;
@@ -65,50 +65,41 @@ class UpgradeDetails {
   void deriveProperties(UpgradeCount upgradeCount, double linesOfCode) {
     final maxPossibleUpgrades = _calculateMaxUpgrade(linesOfCode);
     double levelAfterUpgrade;
-    double levels;
 
     switch (upgradeCount) {
       case UpgradeCount.SINGLE:
-        levels = level + 1;
         levelAfterUpgrade = level + 1;
         break;
       case UpgradeCount.ONE_PERCENT:
-        levels = maxPossibleUpgrades / 100;
         levelAfterUpgrade = (maxPossibleUpgrades / 100).roundToDouble();
         break;
       case UpgradeCount.TEN_PERCENT:
-        levels = maxPossibleUpgrades / 10;
         levelAfterUpgrade = (maxPossibleUpgrades / 10).roundToDouble();
         break;
       case UpgradeCount.FIFTY_PERCENT:
-        levels = maxPossibleUpgrades / 2;
         levelAfterUpgrade = (maxPossibleUpgrades / 2).roundToDouble();
         break;
       case UpgradeCount.MAX:
-        levels = maxPossibleUpgrades;
         levelAfterUpgrade = maxPossibleUpgrades;
     }
 
-    maxPossibleLevel = maxPossibleUpgrades;
+    levelAfterUpgrade = max(levelAfterUpgrade, level);
+
+    levelAfterLeveledUp = levelAfterUpgrade;
     upgradeCost = baseCost *
-        (pow(expBase, level) * (pow(expBase, levels) - 1)) /
+        (pow(expBase, level) * (pow(expBase, levelAfterUpgrade) - 1)) /
         (expBase - 1);
 
     final linesOfCodeAfterUpgrade =
         _calculateLinesOfCodePerLoop(levelAfterUpgrade);
 
     upgradePercentageProfit = linesOfCodePerLoop != 0.0
-        ? "+ " +
+        ? "+" +
             prettifyNumber(
-                (linesOfCodeAfterUpgrade / (linesOfCodePerLoop ?? 1)) * 100) +
+                ((linesOfCodeAfterUpgrade / (linesOfCodePerLoop ?? 1)) - 1) *
+                    100) +
             " %"
         : "";
-  }
-
-  void levelUp(double newLevel) {
-    level = newLevel;
-
-    linesOfCodePerLoop = _calculateLinesOfCodePerLoop(newLevel);
   }
 
   double _calculateMaxUpgrade(double linesOfCode) {

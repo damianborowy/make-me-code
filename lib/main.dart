@@ -111,7 +111,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
-    _setupTimer();
     _calculateIdleEarnings();
 
     WidgetsBinding.instance!.addObserver(LifecycleEventHandler(
@@ -155,21 +154,7 @@ class _MyHomePageState extends State<MyHomePage> {
             )),
         body: Column(
           children: [
-            TextButton(
-              child: Text('click'),
-              onPressed: () => context
-                  .read<EngineProvider>()
-                  .setDelay(context.read<EngineProvider>().delay ~/ 2),
-            ),
-            TextButton(
-              child: Text('reset money'),
-              onPressed: () => context
-                  .read<UpgradesProvider>()
-                  .realmUpgrades
-                  .realmUpgrades[Realm.FRONTEND]!
-                  .linesOfCode = 0,
-            ),
-            UpgradesPanel()
+            UpgradesPanel(),
           ],
         ),
         bottomNavigationBar: MyBottomNavBar());

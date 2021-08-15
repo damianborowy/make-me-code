@@ -14,6 +14,14 @@ extension UpgradeCountExtension on UpgradeCount {
     switch (this) {
       case UpgradeCount.SINGLE:
         return '1x';
+      case UpgradeCount.ONE_PERCENT:
+        return '1%';
+      case UpgradeCount.TEN_PERCENT:
+        return '10%';
+      case UpgradeCount.FIFTY_PERCENT:
+        return '50%';
+      case UpgradeCount.MAX:
+        return 'MAX';
       default:
         return '';
     }

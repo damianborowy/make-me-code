@@ -14,7 +14,9 @@ final magnitudes = {
   36: "HH",
 };
 
-String prettifyNumber(num number) {
+String prettifyNumber(num? number) {
+  if (number == null) return "";
+
   if (number >= 1000000) {
     int exponent = log(number) ~/ log(10);
     String mantissa = ((number / pow(10, exponent)) * pow(10, exponent % 3))
