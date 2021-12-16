@@ -63,7 +63,6 @@ class UpgradeDetails {
   }
 
   void deriveProperties(UpgradeCount upgradeCount, double linesOfCode) {
-    final maxPossibleUpgrades = _calculateMaxUpgrade(linesOfCode);
     double levelAfterUpgrade;
 
     switch (upgradeCount) {
@@ -71,16 +70,16 @@ class UpgradeDetails {
         levelAfterUpgrade = level + 1;
         break;
       case UpgradeCount.ONE_PERCENT:
-        levelAfterUpgrade = (maxPossibleUpgrades / 100).roundToDouble();
+        levelAfterUpgrade = _calculateMaxUpgrade(linesOfCode / 100);
         break;
       case UpgradeCount.TEN_PERCENT:
-        levelAfterUpgrade = (maxPossibleUpgrades / 10).roundToDouble();
+        levelAfterUpgrade = _calculateMaxUpgrade(linesOfCode / 10);
         break;
       case UpgradeCount.FIFTY_PERCENT:
-        levelAfterUpgrade = (maxPossibleUpgrades / 2).roundToDouble();
+        levelAfterUpgrade = _calculateMaxUpgrade(linesOfCode / 2);
         break;
       case UpgradeCount.MAX:
-        levelAfterUpgrade = maxPossibleUpgrades;
+        levelAfterUpgrade = _calculateMaxUpgrade(linesOfCode);
     }
 
     levelAfterUpgrade = max(levelAfterUpgrade, level);
@@ -103,6 +102,9 @@ class UpgradeDetails {
   }
 
   double _calculateMaxUpgrade(double linesOfCode) {
+    print(
+        "${this.name} - ${log((((linesOfCode * (expBase - 1)) / (baseCost * pow(expBase, level))) + 1) / log(expBase))}");
+
     return log((((linesOfCode * (expBase - 1)) /
                     (baseCost * pow(expBase, level))) +
                 1) /
